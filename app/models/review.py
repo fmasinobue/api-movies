@@ -1,7 +1,4 @@
-
-import mysql.connector  # Importa el conector MySQL para conectar con la base de datos
-
-from database import get_db, close_db
+from app.database import get_db
 
 class Review:
     # Constructor de la clase Review
@@ -14,10 +11,7 @@ class Review:
 
     # Método para guardar o actualizar una reseña en la base de datos
     def save(self):
-        db = get_db()
-
-        # db = mysql.connector.connect(, passwoe ......, user="root")
-
+        db = get_db()  # Obtener la conexión a la base de datos
         cursor = db.cursor()
         if self.id_review:
             # Si la reseña ya tiene un ID, se actualiza su registro en la base de datos
@@ -33,8 +27,7 @@ class Review:
             self.id_review = cursor.lastrowid  # Obtener el ID asignado por la base de datos
         db.commit()  # Confirmar la transacción
         cursor.close()
-        close_db(db)
-    
+
     # Método estático para obtener todas las reseñas de la base de datos
     @staticmethod
     def get_all():
@@ -48,7 +41,6 @@ class Review:
         # Crear una lista de objetos Review a partir de los resultados
         reviews = [Review(id_review=row[0], id_movie=row[1], reviewer_name=row[2], comment=row[3], rating=row[4]) for row in rows]
         cursor.close()
-        close_db(db)
         return reviews  # Devolver la lista de reseñas
 
     # Método estático para obtener una reseña por su ID
@@ -59,7 +51,6 @@ class Review:
         cursor.execute("SELECT * FROM reviews WHERE id_review = %s", (review_id,))  # Ejecutar la consulta para obtener la reseña por ID
         row = cursor.fetchone()  # Obtener el resultado
         cursor.close()
-        close_db(db)
         if row:
             # Si se encontró la reseña, devolver un objeto Review con sus datos
             return Review(id_review=row[0], id_movie=row[1], reviewer_name=row[2], comment=row[3], rating=row[4])
@@ -72,8 +63,6 @@ class Review:
         cursor.execute("DELETE FROM reviews WHERE id_review = %s", (self.id_review,))  # Ejecutar la consulta para eliminar la reseña
         db.commit()  # Confirmar la transacción
         cursor.close()
-        close_db(db)
-
 
     # Método para serializar un objeto Review a un diccionario
     def serialize(self):
@@ -84,8 +73,7 @@ class Review:
             'comment': self.comment,  # Comentario de la reseña
             'rating': self.rating  # Calificación de la reseña
         }
-    
+
     # Método para representar la instancia de Review como una cadena
     def __str__(self):
         return f"RESEÑA: {self.id_review} - {self.reviewer_name} - {self.rating}"
-

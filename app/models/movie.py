@@ -1,24 +1,21 @@
-
-from review import Review
-import mysql.connector  # Importa el conector MySQL para conectar con la base de datos
-
-from database import get_db, close_db
+from app.database import get_db
+from app.models.review import Review
 
 class Movie:
     # Constructor de la clase Movie
-    def __init__(self, id_movie=None, title=None, adult=False, release_year=None, poster_url=None, reviews=None):
+    def __init__(self, id_movie=None, title=None, adult=False, release_year=None, poster_url=None, reviews=[]):
         self.id_movie = id_movie  # ID de la película, se asigna automáticamente para nuevas películas
         self.title = title  # Título de la película
         self.adult = adult  # Indicador de si la película es para adultos
         self.release_year = release_year  # Año de lanzamiento de la película
         self.poster_url = poster_url  # URL del póster de la película
         self.reviews = reviews
-        
+
+        # self.reviews = reviews if reviews is not None else []  # Lista de reseñas asociadas a la película
 
     # Método para guardar o actualizar una película en la base de datos
     def save(self):
-        # db = get_db()  # Obtener la conexión a la base de datos
-        db = get_db()
+        db = get_db()  # Obtener la conexión a la base de datos
         cursor = db.cursor()
         if self.id_movie:
             # Si la película ya tiene un ID, se actualiza su registro en la base de datos
@@ -34,7 +31,6 @@ class Movie:
             self.id_movie = cursor.lastrowid  # Obtener el ID asignado por la base de datos
         db.commit()  # Confirmar la transacción
         cursor.close()
-        close_db(db)
 
     # Método estático para obtener todas las películas con sus reseñas de la base de datos
     @staticmethod
@@ -42,11 +38,9 @@ class Movie:
         """
         Retorna un listado de OBJETOS Movie, cada uno con sus reseñas.
         """
-        db = get_db()
-
-
+        db = get_db()  # Obtener la conexión a la base de datos
         cursor = db.cursor()
-        query = """
+        cursor.execute("""
             SELECT 
                 m.id_movie, m.title, m.adult, m.release_year, m.poster_url,
                 r.id_review, r.reviewer_name, r.comment, r.rating
@@ -54,9 +48,7 @@ class Movie:
                 movies m
             LEFT JOIN 
                 reviews r ON m.id_movie = r.id_movie
-        """
-       
-        cursor.execute(query)  # Ejecutar la consulta para obtener todas las películas con sus reseñas
+        """)  # Ejecutar la consulta para obtener todas las películas con sus reseñas
         rows = cursor.fetchall()  # Obtener todos los resultados
         
         movies_dict = {}
@@ -74,9 +66,8 @@ class Movie:
                 movies_dict[id_movie].reviews.append(review)
 
         cursor.close()
-        close_db(db)
         return list(movies_dict.values())  # Devolver la lista de películas con sus reseñas
-   
+
     @staticmethod
     def get_by_id(movie_id):
         db = get_db()
@@ -103,7 +94,7 @@ class Movie:
             movie_map = {}
             for row in rows:
                 if row[0] not in movie_map:
-                    # Si la película aún no está en el mapa, la añadimos con sus datos básicos
+                    # Si la película aún no está en el mapeo, la añadimos con sus datos básicos
                     movie_map[row[0]] = Movie(id_movie=row[0], title=row[1], poster_url=row[2], release_year=row[3], adult=row[4], reviews=[])
 
                 # Añadir la reseña si existe (puede ser None si no hay reseñas asociadas)
@@ -115,7 +106,6 @@ class Movie:
             return movie_map[movie_id]
 
         return None  # Si no se encontró la película, devolver None
-
     # Método para eliminar una película de la base de datos
     def delete(self):
         db = get_db()  # Obtener la conexión a la base de datos
@@ -125,7 +115,7 @@ class Movie:
         cursor.close()
 
     # Método para serializar un objeto Movie a un diccionario
-    def serialize(self): # to_json
+    def serialize(self):
         return {
             'id_movie': self.id_movie,  # ID de la película
             'title': self.title,  # Título de la película
@@ -134,8 +124,6 @@ class Movie:
             'poster_url': self.poster_url,  # URL del póster de la película
             'reviews': [review.serialize() for review in self.reviews]  # Lista de reseñas serializadas
         }
-    
 
     def __str__(self):
         return f"PELI: {self.id_movie} - {self.title} - {self.release_year}"
-

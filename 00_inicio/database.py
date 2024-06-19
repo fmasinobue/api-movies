@@ -12,6 +12,7 @@ DATABASE_CONFIG = {
 
 # Función para obtener la conexión de la base de datos
 def get_db():
+    print("Abriendo conexion")
 
     db = mysql.connector.connect(**DATABASE_CONFIG)
     # Retorna la conexión a la base de datos
@@ -20,6 +21,7 @@ def get_db():
 
 # Función para cerrar la conexión a la base de datos
 def close_db(db):
+    print("Cerrando conexion")
     db.close()
 
 
