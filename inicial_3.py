@@ -43,9 +43,9 @@ def create_movie():
     print("HOLA")
     # data = request.json
     data = request.form
+    print("que hay en data ", data)
     archivo=request.files['imagen']
-    # print("que hay en data ", data)
-
+    print(archivo)
     # Trabajamos con la imagen
     # Utilizamos la función `secure_filename` para obtener un nombre de archivo seguro para la imagen cargada. 
     # Esta función elimina caracteres especiales que podrían causar problemas de seguridad.
