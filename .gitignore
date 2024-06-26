@@ -2,3 +2,4 @@ env1
 */__pycache__
 */*/__pycache__
 .env
+static/img/*.*

@@ -3,6 +3,7 @@ import os, time
 from flask import Flask, jsonify, request
 # Instalar con pip install flask-cors
 from flask_cors import CORS
+
 """
 Para trabajar con archivos asegurar que un nombre de archivo 
 proporcionado por el usuario sea seguro para guardarlo en el sistema de archivos.
@@ -11,7 +12,7 @@ proporcionado por el usuario sea seguro para guardarlo en el sistema de archivos
 from werkzeug.utils import secure_filename
 
 from app.models.movie import Movie
-from app.database import init_app
+from app.database import init_app, init_db
 
 """
 Crear las dependencias
@@ -33,6 +34,10 @@ CORS(app)
 # Inicializar la base de datos con la aplicación Flask
 init_app(app)
 
+@app.route('/init-db')
+def init_db_route():
+    init_db()
+    return "Base de datos inicializada correctamente."
 
 @app.route('/')
 def principal():
