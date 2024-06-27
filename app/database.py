@@ -26,7 +26,7 @@ def get_db():
     # Si no hay una conexión a la base de datos en g, la creamos
     # g, que es un objeto de Flask que se usa para almacenar datos durante la vida útil de una solicitud.
     if 'db' not in g:
-        print("···· Abriendo conexion a DB ····")
+        print("···· Abriendo conexion a DB ····",DATABASE_CONFIG['database']," ---- ",DATABASE_CONFIG['user'])
         g.db = mysql.connector.connect(**DATABASE_CONFIG)
     # Retorna la conexión a la base de datos
     return g.db

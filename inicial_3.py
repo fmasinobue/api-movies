@@ -120,4 +120,4 @@ def update_movie(id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
